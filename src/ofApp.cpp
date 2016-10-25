@@ -3,72 +3,130 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){	 
-	img.load("test_background.png");
+
+    img.load("test_background.png");
     
-	for (int i =0; i<2; i++){
-        
-        warpers[i] = *new ofxGLWarper();
-        warpers[i].setup((i%2)*img.getWidth(),floor(float(i)/2)*img.getHeight(),img.getWidth(), img.getHeight());
-       //warpers.back().activate();
-    }
+    fboMain.allocate(1024, 384);
+    
+    warpersL = *new ofxGLWarper();
+    warpersR = *new ofxGLWarper();
+    warpersL.setup(0, 0, 512, 384);
+    warpersR.setup(512, 0, 512, 384);
+
+    
     ofSetVerticalSync(true);
 	
 	activeWarper =-1;
+    movingX = 0;
 }
+
+
 
 //--------------------------------------------------------------
 void ofApp::update(){	
-	ofBackground(20, 20, 20);
-	
+
+    
+    fboMain.begin();
+    ofClear(0,0);
+    img.resize(1024, 384);
+    img.draw(0, 0);
+    
+    
+    ofPushStyle();
+    ofSetColor(0,255,0);
+    for(int i=0; i<ofGetWidth(); i+=10) {
+        for(int j=0; j<ofGetHeight(); j+=10) {
+            ofDrawLine(i, 0, i, ofGetHeight());
+            ofDrawLine(0, j, ofGetWidth(), j);
+        }
+    }
+    ofPopStyle();
+    
+    fboMain.end();
+    
+    
 }
+
+
+
+
 //--------------------------------------------------------------
 void ofApp::draw(){
-    for (int i =0; i<2; i++){
-        warpers[i].begin();	
-        warpers[i].draw(); 
-        img.draw((i%2)*img.getWidth(),floor(float(i)/2)*img.getHeight());
-        warpers[i].draw();
-        warpers[i].end();
-	}
-    ofDrawBitmapString("Press keys 1 to 4 to toggle each warper", 20, 50);
+    
+    ofBackground(255);
+    
+    ofImage _main;
+    _main.allocate(1024, 384, OF_IMAGE_COLOR_ALPHA);
+    ofPixels _pMain;
+    _pMain.allocate(1024, 384, OF_PIXELS_BGRA);
+    fboMain.readToPixels(_pMain);
+    _main.setFromPixels(_pMain.getData(), 1024, 384, OF_IMAGE_COLOR_ALPHA);
+
+    
+    warpersL.begin();
+    warpersL.draw();
+    _main.drawSubsection(0, 0, 512, 384, 0, 0);
+    warpersL.end();
+
+    warpersR.begin();
+    warpersR.draw();
+    _main.drawSubsection(512, 0, 512, 384, 512, 0);
+    warpersR.end();
+    
+
+    
+    
+//    for (int i =0; i<2; i++){
+//        warpers[i].begin();
+//        warpers[i].draw();
+//        
+//        ofImage _L;
+//        _L.allocate(512, 384, OF_IMAGE_COLOR_ALPHA);
+//        ofPixels _pL;
+//        _pL.allocate(512, 384, OF_PIXELS_BGRA);
+//        fboL.readToPixels(_pL);
+//        _L.setFromPixels(_pL.getData(), 512, 384, OF_IMAGE_COLOR_ALPHA);
+//        
+//        fboR.draw(512, 0);
+//        warpers[i].draw();
+//        warpers[i].end();
+//    }
+
+
 }
+
+
+
+
+
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
   bool bDeactivateOthers = false;
     switch (key) {
         case '1':
             activeWarper=0;
-            warpers[0].toogleActive();
-            bDeactivateOthers =true;
+            warpersL.toogleActive();
+            bDeactivateOthers = true;
             break;
             //*
         case '2':
             activeWarper=1;
-            warpers[1].toogleActive();
-            bDeactivateOthers =true;
+            warpersR.toogleActive();
+            bDeactivateOthers = true;
             break;
-        case '3':
-            activeWarper=2;        
-            bDeactivateOthers =true;
-            warpers[2].toogleActive();
-            break;
-        case '4':
-            activeWarper=3;        
-            bDeactivateOthers =true;
-            warpers[3].toogleActive();
-            break; 
-            //*/
-            default:
+
+        default:
             break;
     }
     
     if (bDeactivateOthers) {
-        for (int i =0; i<2; i++){
-            if (i!=activeWarper) {
-                warpers[i].deactivate();
-            }
+        if (activeWarper == 0) {
+            warpersR.deactivate();
+        } else if (activeWarper == 1){
+            warpersL.deactivate();
         }
     }
+
 }
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){}

@@ -22,13 +22,9 @@ public:
     ofxGLWarper warpersR;
     
     ofImage img;
-    int activeWarper;
-    
     
     ofFbo fboMain;
-    
-    float movingX;
-    
+        
 };
 
 

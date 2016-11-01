@@ -3,6 +3,8 @@
 #include "ofMain.h"
 #include "ofxGLWarper.h"
 
+
+
 class ofApp : public ofSimpleApp{
     
 public:
@@ -24,7 +26,17 @@ public:
     ofImage img;
     
     ofFbo fboMain;
-        
+    
+    vector<ofImage> silhoutteImg;
+    vector<ofPoint> positionsWD;
+    void positionSet();
+    
+    ofDirectory _dir;
+    
+    vector<int> indexPositionWD;
+    
+    int sizeFactor;
+    
 };
 
 

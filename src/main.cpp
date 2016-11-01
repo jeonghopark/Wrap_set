@@ -9,6 +9,6 @@ int main( ){
     ofGLFWWindowSettings settings;
     settings.multiMonitorFullScreen = true;
     
-    ofCreateWindow(settings)->setFullscreen(true);
+    ofCreateWindow(settings)->setFullscreen(false);
     ofRunApp(new ofApp());
 }
